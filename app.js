@@ -10,16 +10,16 @@ const {
   dislikeClothesItem,
 } = require("./controllers/clothingItems");
 
-const id = "69cc5fea4dc31b627815b777";
-
 const app = express();
 const { port = 3001 } = process.env;
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 app.use(express.json());
 app.use((req, res, next) => {
+  // Use an explicit header when tests set the user, fallback to local default.
+  const userIdFromHeader = req.header("x-user-id");
   req.user = {
-    _id: id, // paste the _id of the test user created in the previous step
+    _id: userIdFromHeader || "69cc5fea4dc31b627815b777",
   };
   next();
 });
