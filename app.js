@@ -27,6 +27,7 @@ app.use((req, res, next) => {
 app.get(`/users`, getUsers);
 app.get(`/users/:userId`, getUser);
 app.post("/users", createUser);
+app.post("/signup", createUser); // added for Sprint 12 expected route
 
 app.get(`/items`, getClothesItems);
 app.post("/items", createClothesItem);
