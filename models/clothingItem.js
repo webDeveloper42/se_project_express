@@ -16,7 +16,12 @@ const clothingItem = new Schema({
   imageUrl: {
     type: String,
     required: true,
-    typeof: "url",
+    validate: {
+      validator(value) {
+        return validator.isURL(value);
+      },
+      message: "You must enter a valid URL",
+    },
   },
   owner: {
     type: Schema.Types.ObjectId,
@@ -30,13 +35,8 @@ const clothingItem = new Schema({
     },
   ],
   createAt: {
-    Date: Date.now,
-  },
-  validate: {
-    validator(value) {
-      return validator.isURL(value);
-    },
-    message: "You must enter a valid URL",
+    type: Date,
+    default: Date.now,
   },
 });
 module.exports = model("ClothingItem", clothingItem);
