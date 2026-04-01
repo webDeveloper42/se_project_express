@@ -28,12 +28,10 @@ const clothingItem = new Schema({
     ref: "User",
     required: true,
   },
-  likes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
+  likes: {
+    type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    default: [],
+  },
   createdAt: {
     type: Date,
     required: true,
