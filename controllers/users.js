@@ -22,7 +22,7 @@ const getUser = (req, res) => {
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
-      console.error(err.name, err.message);
+      console.error(err);
       if (err.name === "CastError" || err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR)
@@ -42,7 +42,7 @@ const createUser = (req, res) => {
   User.create({ name, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.error(err.name, err.message);
+      console.error(err);
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR)

@@ -17,8 +17,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/signup", createUser);
-
 app.use(router);
 
 if (require.main === module) {

@@ -22,7 +22,7 @@ const deleteClothesItem = (req, res) => {
     .orFail()
     .then((item) => res.send(item))
     .catch((err) => {
-      console.error(err.name, err.message);
+      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR)
@@ -39,11 +39,11 @@ const deleteClothesItem = (req, res) => {
 
 const createClothesItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const ownerId = req.user?._id;
+  const ownerId = req.user._id;
   Item.create({ name, weather, imageUrl, owner: ownerId })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
-      console.error(err.name, err.message);
+      console.error(err);
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR)
@@ -66,7 +66,7 @@ const likeClothesItem = (req, res) => {
     .orFail()
     .then((item) => res.send(item))
     .catch((err) => {
-      console.error(err.name, err.message);
+      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR)
@@ -92,7 +92,7 @@ const dislikeClothesItem = (req, res) => {
     .orFail()
     .then((item) => res.send(item))
     .catch((err) => {
-      console.error(err.name, err.message);
+      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR)
