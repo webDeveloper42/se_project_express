@@ -6,6 +6,8 @@ const {
   getClothesItems,
   createClothesItem,
   deleteClothesItem,
+  likeClothesItem,
+  dislikeClothesItem,
 } = require("./controllers/clothingItems");
 
 const id = "69cc5fea4dc31b627815b777";
@@ -29,6 +31,8 @@ app.post("/users", createUser);
 app.get(`/items`, getClothesItems);
 app.post("/items", createClothesItem);
 app.delete(`/items/:itemId`, deleteClothesItem);
+app.put(`/items/:itemId/likes`, likeClothesItem);
+app.delete(`/items/:itemId/likes`, dislikeClothesItem);
 
 app.use((req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: "Requested resource not found" });

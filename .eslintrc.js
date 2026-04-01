@@ -24,5 +24,14 @@ module.exports = {
   rules: {
     "no-unused-vars": ["error", { argsIgnorePattern: "^_id" }],
     "no-console": "off",
+    "no-underscore-dangle": [
+      "error",
+      {
+        allow: ["_id"],
+        allowAfterThis: true,
+        allowAfterSuper: true,
+        enforceInMethodNames: false,
+      },
+    ],
   },
 };

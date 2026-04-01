@@ -39,7 +39,7 @@ const deleteClothesItem = (req, res) => {
 
 const createClothesItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const ownerId = req.user?.id;
+  const ownerId = req.user?._id;
   Item.create({ name, weather, imageUrl, owner: ownerId })
     .then((item) => res.send(item))
     .catch((err) => {
@@ -55,4 +55,62 @@ const createClothesItem = (req, res) => {
     });
 };
 
-module.exports = { getClothesItems, deleteClothesItem, createClothesItem };
+const likeClothesItem = (req, res) => {
+  const { itemId } = req.params;
+
+  Item.findByIdAndUpdate(
+    itemId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((item) => res.send(item))
+    .catch((err) => {
+      console.error(err.name, err.message);
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR)
+          .send({ message: "Invalid item ID" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
+const dislikeClothesItem = (req, res) => {
+  const { itemId } = req.params;
+
+  Item.findByIdAndUpdate(
+    itemId,
+    { $pull: { likes: req.user._id } },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((item) => res.send(item))
+    .catch((err) => {
+      console.error(err.name, err.message);
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR)
+          .send({ message: "Invalid item ID" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
+module.exports = {
+  getClothesItems,
+  deleteClothesItem,
+  createClothesItem,
+  likeClothesItem,
+  dislikeClothesItem,
+};
