@@ -11,7 +11,7 @@ const clothingItem = new Schema({
   weather: {
     type: String,
     required: true,
-    enum: ["hot", "warm", "cool", "cold"],
+    enum: ["hot", "warm", "cold"],
   },
   imageUrl: {
     type: String,
@@ -34,8 +34,9 @@ const clothingItem = new Schema({
       ref: "User",
     },
   ],
-  createAt: {
+  createdAt: {
     type: Date,
+    required: true,
     default: Date.now,
   },
 });
