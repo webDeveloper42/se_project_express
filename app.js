@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.get(`/users`, getUsers);
 app.get(`/users/:userId`, getUser);
 app.post("/users", createUser);
-app.post("/signup", createUser); // added for Sprint 12 expected route
+app.post("/signup", createUser);
 
 app.get(`/items`, getClothesItems);
 app.post("/items", createClothesItem);
@@ -39,4 +39,8 @@ app.use((req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: "Requested resource not found" });
 });
 
-app.listen(port);
+if (require.main === module) {
+  app.listen(port);
+}
+
+module.exports = app;
