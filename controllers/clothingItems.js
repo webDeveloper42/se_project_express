@@ -3,6 +3,7 @@ const {
   BAD_REQUEST_ERROR,
   NOT_FOUND_ERROR,
   INTERNAL_SERVER_ERROR,
+  FORBIDDEN_ERROR,
 } = require("../utils/errors");
 
 const getClothesItems = (req, res) => {
@@ -18,11 +19,15 @@ const getClothesItems = (req, res) => {
 
 const deleteClothesItem = (req, res) => {
   const { itemId } = req.params;
-  Item.findByIdAndDelete(itemId)
+  Item.findById(itemId) //
     .orFail()
-    .then((item) => res.send(item))
+    .then((item) => {
+      if (item.owner.toString() !== req.user._id.toString()) {
+        return res.status(FORBIDDEN_ERROR).send({ message: "Forbidden" });
+      }
+      return item.deleteOne().then(() => res.send(item));
+    })
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR)

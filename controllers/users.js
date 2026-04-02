@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const {
   BAD_REQUEST_ERROR,
   NOT_FOUND_ERROR,
@@ -17,9 +19,9 @@ const getUsers = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+const getCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findById(_id)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -44,7 +46,11 @@ const createUser = (req, res) => {
     .hash(password, 10)
     .then((hash) => {
       return User.create({ name, avatar, email, password: hash })
-        .then((user) => res.status(201).send(user))
+        .then((user) => {
+          const userObject = user.toObject();
+          delete userObject.password;
+          res.status(201).send(userObject);
+        })
         .catch((err) => {
           if (err.name === "ValidationError") {
             return res
@@ -78,4 +84,30 @@ const login = (req, res) => {
     .catch((err) => res.status(401).send({ message: err.message }));
 };
 
-module.exports = { getUsers, getUser, createUser, login };
+const updateCurrentUser = (req, res) => {
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: err.message });
+      }
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+    });
+};
+
+module.exports = {
+  getUsers,
+  getCurrentUser,
+  createUser,
+  login,
+  updateCurrentUser,
+};

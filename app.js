@@ -1,21 +1,22 @@
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const router = require("./routes/index");
+const auth = require("./middleware/auth");
+const { login, createUser } = require("./controllers/users");
+const { getClothesItems } = require("./controllers/clothingItems");
 
 const app = express();
 const { port = 3001 } = process.env;
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 app.use(express.json());
-app.use((req, res, next) => {
-  // Use an explicit header when tests set the user, fallback to local default.
-  const userIdFromHeader = req.header("x-user-id");
-  req.user = {
-    _id: userIdFromHeader || "69cc5fea4dc31b627815b777",
-  };
-  next();
-});
 
+app.use(cors());
+app.post("/signup", createUser);
+app.post("/signin", login);
+app.get("/items", getClothesItems);
+app.use(auth);
 app.use(router);
 
 if (require.main === module) {
