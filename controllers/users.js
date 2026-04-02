@@ -4,20 +4,13 @@ const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST_ERROR,
+  UNAUTHORIZED_ERROR,
   NOT_FOUND_ERROR,
+  CONFLICT_ERROR,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch((err) => {
-      console.error(err);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
-    });
-};
+// Removed getUsers: not allowed by sprint requirements, must read current user only
 
 const getCurrentUser = (req, res) => {
   const { _id } = req.user;
@@ -42,9 +35,16 @@ const getCurrentUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  bcrypt
+
+  if (!name || !avatar || !email || !password) {
+    return res
+      .status(BAD_REQUEST_ERROR)
+      .send({ message: "All required fields must be provided" });
+  }
+
+  return bcrypt
     .hash(password, 10)
-    .then((hash) => {
+    .then((hash) =>
       User.create({ name, avatar, email, password: hash })
         .then((user) => {
           const userObject = user.toObject();
@@ -58,25 +58,31 @@ const createUser = (req, res) => {
               .send({ message: "Invalid data passed to user creation" });
           }
           if (err.code === 11000) {
-            return res.status(409).send({ message: "Email already exist" });
+            return res
+              .status(CONFLICT_ERROR)
+              .send({ message: "Email already exists" });
           }
+          console.error(err);
           return res
             .status(INTERNAL_SERVER_ERROR)
             .send({ message: "An error has occurred on server" });
-        });
-    })
-    .catch(() =>
-      res
+        })
+    )
+    .catch((err) => {
+      console.error(err);
+      return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on server" })
-    );
+        .send({ message: "An error has occurred on server" });
+    });
 };
 
 const login = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send({ message: "Email and password are required" });
+    return res
+      .status(BAD_REQUEST_ERROR)
+      .send({ message: "Email and password are required" });
   }
 
   return User.findUserByCredentials(email, password)
@@ -84,9 +90,20 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.send({ token });
+      return res.send({ token });
     })
-    .catch((err) => res.status(401).send({ message: err.message }));
+    .catch((err) => {
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(UNAUTHORIZED_ERROR)
+          .send({ message: "Incorrect email or password" });
+      }
+
+      console.error(err);
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on server" });
+    });
 };
 
 const updateCurrentUser = (req, res) => {
@@ -100,17 +117,21 @@ const updateCurrentUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_ERROR)
+          .send({ message: "Invalid data passed to update" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: err.message });
+        return res.status(NOT_FOUND_ERROR).send({ message: "User not found" });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+      console.error(err);
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on server" });
     });
 };
 
 module.exports = {
-  getUsers,
   getCurrentUser,
   createUser,
   login,
