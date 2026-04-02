@@ -1,7 +1,7 @@
-const User = require("../models/user");
-const { JWT_SECRET } = require("../utils/config");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST_ERROR,
   NOT_FOUND_ERROR,
@@ -45,11 +45,11 @@ const createUser = (req, res) => {
   bcrypt
     .hash(password, 10)
     .then((hash) => {
-      return User.create({ name, avatar, email, password: hash })
+      User.create({ name, avatar, email, password: hash })
         .then((user) => {
           const userObject = user.toObject();
           delete userObject.password;
-          res.status(201).send(userObject);
+          return res.status(201).send(userObject);
         })
         .catch((err) => {
           if (err.name === "ValidationError") {
@@ -65,11 +65,11 @@ const createUser = (req, res) => {
             .send({ message: "An error has occurred on server" });
         });
     })
-    .catch((err) => {
-      return res
+    .catch(() =>
+      res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on server" });
-    });
+        .send({ message: "An error has occurred on server" })
+    );
 };
 
 const login = (req, res) => {
