@@ -7,7 +7,7 @@ const userRouter = require("./users");
 const clothingItemRouter = require("./clothingItems");
 
 router.post("/signup", createUser);
-router.post("/signin", login);
+router.post("/login", login);
 router.get("/items", getClothesItems);
 
 router.use("/users", auth, userRouter);
