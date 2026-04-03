@@ -18,6 +18,8 @@ module.exports = (req, res, next) => {
     req.user = payload;
     return next();
   } catch (err) {
-    return res.status(401).send({ message: "Authorization required" });
+    return res
+      .status(UNAUTHORIZED_ERROR)
+      .send({ message: "Authorization required" });
   }
 };
