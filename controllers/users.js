@@ -10,8 +10,6 @@ const {
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
-// Removed getUsers: not allowed by sprint requirements, must read current user only
-
 const getCurrentUser = (req, res) => {
   const { _id } = req.user;
   User.findById(_id)
