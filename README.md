@@ -23,7 +23,7 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
 
-Link to Video showcasing this project: [Click Here](https://www.loom.com/share/1ff503c20f0c47f1859d7b14eb49aa45)
+Link to Video showcasing this project: [Click Here](https://www.loom.com/share/1e3f620fca114d8da3b0b22288aad406)
 
 Link to my published domain: [Click Here](https://whyweatherwhy.twilightparadox.com/)
 
