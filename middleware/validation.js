@@ -2,10 +2,10 @@ const { Joi, celebrate } = require("celebrate");
 const validator = require("validator");
 
 const validateUrl = (value, helpers) => {
-  if (validator.isURL(value)) {
+  if (validator.isURL(value, { require_protocol: true })) {
     return value;
   }
-  return helpers.error("string.uri");
+  return helpers.message("Invalid URL format");
 };
 
 const validateClothingItem = celebrate({
@@ -75,7 +75,7 @@ const validateCurrentUser = celebrate({
       "string.max": 'The maximum length of the "name" field is 30',
       "string.empty": 'The "name" field must be filled in',
     }),
-    avatar: Joi.string().required().custom(validateUrl).messages({
+    avatar: Joi.string().required().messages({
       "string.empty": 'The "avatar" field must be filled in',
       "string.uri": 'The "avatar" field must be a valid URL',
     }),
